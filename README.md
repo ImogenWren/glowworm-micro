@@ -1,4 +1,5 @@
 <img width="693" height="161" alt="glowworm-logo-export" src="https://github.com/user-attachments/assets/c39ae390-12af-45af-bcf6-94ba85d72106" />
+
 # glowworm-micro
 Project to build a small battery powered handheld lighting controller for creative macro photography
 
@@ -9,7 +10,7 @@ Project to build a small battery powered handheld lighting controller for creati
 - Arduino IoT33 Controller (could be ported to ESP32)
 - 1S Lipo battery pack with charger
 - Power on and off device using external interrupts
-- Rotary Encoder for changing values<img width="693" height="161" alt="glowworm-logo-export" src="https://github.com/user-attachments/assets/c90c7176-4a7a-428a-82e8-9ccf69c4ba16" />
+- Rotary Encoder for changing values
 
 - Buttons to select parameter
 - Detachable WS2821 Led Strip with 3D printed diffuser options
