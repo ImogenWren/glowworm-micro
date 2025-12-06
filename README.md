@@ -1,5 +1,5 @@
-# glowworm-micro
 <img width="693" height="161" alt="glowworm-logo-export" src="https://github.com/user-attachments/assets/c39ae390-12af-45af-bcf6-94ba85d72106" />
+# glowworm-micro
 Project to build a small battery powered handheld lighting controller for creative macro photography
 
 
