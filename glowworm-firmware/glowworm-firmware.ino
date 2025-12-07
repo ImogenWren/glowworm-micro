@@ -38,7 +38,7 @@ void setup() {
 
   // use interrupt for CLK pin is enough
   // call ISR_encoder() when CLK pin changes from LOW to HIGH
-  attachInterrupt(digitalPinToInterrupt(ENCODER_CLK), ISR_encoder, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENCODER_CLK), ISR_encoder, RISING);
 
 
   // set up LED string

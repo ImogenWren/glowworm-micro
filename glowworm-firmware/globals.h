@@ -92,12 +92,23 @@ const uint8_t I2C_ADDRESS = 0x08;  // Address of i2c slave (self)
 // LED data struc -> set up like this to make saving and recalling data from memory easy
 
 // blend modes
-typedef enum blend_mode {
+typedef enum {
   NO_BLEND,
-  SIMPLE_BLEND,
+  DIRECT_BLEND,
   WHEEL_SHORT,
   WHEEL_LONG
+} blend_mode;
+
+blend_mode currentBlend = NO_BLEND;
+
+static char blendNames[][8] = {
+"None",
+"Direct",
+"Long",
+"Short"
 };
+
+
 
 struct LED_data {  // Channel A
   uint8_t ch_A_hue;

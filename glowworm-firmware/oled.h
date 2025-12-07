@@ -141,36 +141,80 @@ void old_stats_screen() {
 }
 
 // for new stats screen
+#define BOX_WIDTH 60
+#define BOX_HEIGHT 45
+#define BOX_RADIUS 2
 
 #define COL_0 2
-#define COL_1 20
-#define COL_2 65
-#define COL_3 80
+#define COL_1 36
+#define COL_2 128 - BOX_WIDTH
+#define COL_3 92
 
 #define ROW_0 2
 //#define ROW_1 16  // minimum to stop clipping the yellow
 #define ROW_1 18
-#define ROW_2 28
-#define ROW_3 41
+#define ROW_2 29
+#define ROW_3 40
 #define ROW_4 51
+
+
 
 void power_stats_screen() {
   display.setTextColor(WHITE);
+  char printBuffer[24];
+  // Global Settings
+  display.setCursor(60, 0);  //(x,y) (COL, ROW)
+  sprintf(printBuffer, "leds: %u", num_leds);
+  display.print(printBuffer);
 
-  display.drawRoundRect(0, 16, 46, 11, 8, WHITE);  // x, y, w, h, colour
+  display.setCursor(60, 8);  //(x,y) (COL, ROW)
+  sprintf(printBuffer, "blnd: %s", blendNames[currentBlend]);
+  display.print(printBuffer);
+
+  // do channel A first
+  display.drawRoundRect(0, 16, BOX_WIDTH, BOX_HEIGHT, BOX_RADIUS, WHITE);  // x, y, w, h, rad, colour
   display.setCursor(COL_0, ROW_1);
-  display.print(F(" CH:A "));
-  display.setCursor(COL_3, ROW_1);
+  display.print(F("CH:A "));
+
+  display.setCursor(COL_0, ROW_2);
+  sprintf(printBuffer, "Hue: %2u", currentLED.ch_A_hue);
+  display.print(printBuffer);
+
+  display.setCursor(COL_0, ROW_3);
+  sprintf(printBuffer, "Sat: %2u", currentLED.ch_A_sat);
+  display.print(printBuffer);
 
 
-  display.setCursor(COL_1, ROW_2);
- display.print(buttonPressed);
+  display.setCursor(COL_0, ROW_4);
+  sprintf(printBuffer, "Brt: %2u", currentLED.ch_A_bright);
+  display.print(printBuffer);
+
+
+  // do channel B first
+  display.drawRoundRect(126 - BOX_WIDTH, 16, BOX_WIDTH, BOX_HEIGHT, BOX_RADIUS, WHITE);  // x, y, w, h, rad, colour
+  display.setCursor(COL_2, ROW_1);
+  display.print(F("CH:B "));
+
+  display.setCursor(COL_2, ROW_2);
+
+  sprintf(printBuffer, "Hue: %2u", currentLED.ch_B_hue);
+  display.print(printBuffer);
+
+  display.setCursor(COL_2, ROW_3);
+
+  sprintf(printBuffer, "Sat: %2u", currentLED.ch_B_sat);
+  display.print(printBuffer);
+
+
+  display.setCursor(COL_2, ROW_4);
+  sprintf(printBuffer, "Brt: %2u", currentLED.ch_B_bright);
+  display.print(printBuffer);
+
+
+
+  display.print(buttonPressed);
 
   display.setCursor(COL_3, ROW_2);
-
-  display.print(encoderVal);
-
-
 }
 
 void update_oled() {  // char *Vexp, char *Iexp, char *Vsbc, char *Isbc, char *sbcTrig, char *extTrig, char *expTrig, char *sbcReboot, char *expReboot) {
@@ -178,13 +222,18 @@ void update_oled() {  // char *Vexp, char *Iexp, char *Vsbc, char *Isbc, char *s
   // display.setTextSize(1.9);  // Draw 2X-scale text
 
   display.setTextColor(BLACK);
-  display.fillRoundRect(0, 0, 128, 12, 2, WHITE);  // x, y, w, h, colour
+  // display.fillRoundRect(0, 0, 128, 15, 2, WHITE);  // x, y, w, h, colour // full bar
+  display.fillRoundRect(0, 0, 50, 9, 2, WHITE);  // x, y, w, h, colour // full bar
   // display.setFont(&FreeMonoBold9pt7b);
-  display.setCursor(COL_0, ROW_0);  //(x,y) (COL, ROW)
+  display.setCursor(1, 1);  //(x,y) (COL, ROW)
+  display.print(F("GlowWorm"));
+  display.setCursor(1, 7);  //(x,y) (COL, ROW)
+                            //  display.setTextColor(WHITE);
+                            // char printBuffer[24];
+  //sprintf(printBuffer, "          Blend: %s", blendNames[currentBlend]);
+ // display.print(printBuffer);
 
-    display.print(F("  GlowWorm Micro"));
-
-  display.setTextSize(1.9);  // Draw 2X-scale text
+  // display.setTextSize(1.9);  // Draw 2X-scale text
 
   power_stats_screen();
 
