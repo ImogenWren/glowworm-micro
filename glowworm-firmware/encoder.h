@@ -2,10 +2,20 @@
 
 
 void ISR_encoder() {
-  if ((millis() - last_time) < 1)  // debounce time is 50ms
+  if ((millis() - last_time) < 1) {  // debounce time is 50ms
     return;
+  }
+  int16_t clock = digitalRead(ENCODER_CLK);
+  int16_t data = digitalRead(ENCODER_DAT);
+  // encoderVal += (clock != data) ? +1 : -1;
+  if (clock != data) {
+    encoderVal++;
+  } else {
+    encoderVal--;
+  }
 
-  encoderVal += (digitalRead(ENCODER_CLK) != digitalRead(ENCODER_DAT)) ? +1 : -1;
+  ISR_triggered = true;
+
   last_time = millis();
 }
 

@@ -41,7 +41,9 @@ void setup() {
   attachInterrupt(digitalPinToInterrupt(ENCODER_CLK), ISR_encoder, CHANGE);
 
 
-
+  // set up LED string
+  FastLED.addLeds<LED_TYPE, LED_DATA_PIN, COLOR_ORDER>(leds, NUM_LEDS).setCorrection(TypicalLEDStrip);
+  FastLED.setBrightness(BRIGHTNESS);
 
 
   // Set up i2c slave to handle requests from Raspberry Pi
@@ -82,6 +84,15 @@ void loop() {
   update_oled();
   //  samples_taken = 0;
   // }
+  if (ISR_triggered) {
+    for (int i = 0; i < NUM_LEDS; ++i) {
+      leds[i] = CHSV(encoderVal, 255, BRIGHTNESS);
+    }
+
+    FastLED.show();
+    // FastLED.delay(1000 / UPDATES_PER_SECOND);
+    ISR_triggered = false;
+  }
 }
 
 

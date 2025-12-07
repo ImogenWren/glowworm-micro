@@ -11,6 +11,7 @@
 #include <Wire.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
+#include <FastLED.h>
 
 
 
@@ -49,6 +50,13 @@
 // LED
 #define LED_DATA_PIN 6
 
+#define NUM_LEDS 6
+#define BRIGHTNESS 80
+#define LED_TYPE WS2811
+#define COLOR_ORDER GRB
+#define UPDATES_PER_SECOND 100
+CRGB leds[NUM_LEDS];
+
 // Battery Monitor
 
 #define BATTERY_SENSE_PIN A0
@@ -72,6 +80,7 @@ volatile uint8_t encoderVal = 0;
 uint8_t buttonPressed = 0;
 volatile int direction = DIRECTION_CW;
 volatile uint32_t last_time;
+volatile bool ISR_triggered = false;
 
 // Consts
 //const char SYSTEM_NAME = {"Practable Power Hat V1.0"}
