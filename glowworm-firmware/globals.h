@@ -21,7 +21,7 @@
 #include <Fonts/FreeSansBold12pt7b.h >
 #include <Fonts/FreeSansBold9pt7b.h >
 
-#include <avr/dtostrf.h> //needed for SAMD21 only
+#include <avr/dtostrf.h>  //needed for SAMD21 only
 
 #include <buttonObject.h>
 
@@ -51,7 +51,7 @@
 #define LED_DATA_PIN 6
 
 #define NUM_LEDS 6
-#define BRIGHTNESS 80
+#define START_BRIGHTNESS 60
 #define LED_TYPE WS2811
 #define COLOR_ORDER GRB
 #define UPDATES_PER_SECOND 100
@@ -88,6 +88,50 @@ const uint8_t I2C_ADDRESS = 0x08;  // Address of i2c slave (self)
 
 
 
+
+// LED data struc -> set up like this to make saving and recalling data from memory easy
+
+// blend modes
+typedef enum blend_mode {
+  NO_BLEND,
+  SIMPLE_BLEND,
+  WHEEL_SHORT,
+  WHEEL_LONG
+};
+
+struct LED_data {  // Channel A
+  uint8_t ch_A_hue;
+  uint8_t ch_A_sat;
+  uint8_t ch_A_bright;
+  uint8_t ch_B_hue;
+  uint8_t ch_B_sat;
+  uint8_t ch_B_bright;
+  int8_t blend;
+  uint8_t num_leds;
+};
+
+LED_data defaultData = {
+  20, 255, START_BRIGHTNESS,
+  230, 255, START_BRIGHTNESS,
+  NO_BLEND, NUM_LEDS
+};
+
+LED_data currentLED = defaultData;
+
+
+// Channel A
+uint8_t ch_A_hue = 20;
+uint8_t ch_A_sat = 255;
+uint8_t ch_A_bright = START_BRIGHTNESS;
+
+// Channel B
+uint8_t ch_B_hue = 230;
+uint8_t ch_B_sat = 255;
+uint8_t ch_B_bright = START_BRIGHTNESS;
+
+// All Channels
+//uint8_t blend = 0;
+uint8_t num_leds = 6;
 
 // Internal Headers
 #include "encoder.h"
