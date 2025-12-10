@@ -37,7 +37,7 @@
 #define ENCODER_CLK 2
 #define ENCODER_DAT 3
 
-#define DIRECTION_CW 1   // clockwise direction
+#define DIRECTION_CW 1    // clockwise direction
 #define DIRECTION_CCW -1  // counter-clockwise direction
 
 #define ENCODER_PPR 600
@@ -51,13 +51,13 @@
 #define LED_DATA_PIN 6
 
 #define NUM_LEDS 6
-#define START_BRIGHTNESS 60
+#define START_BRIGHTNESS 200
 #define LED_TYPE WS2811
 #define COLOR_ORDER GRB
 #define UPDATES_PER_SECOND 100
 
 //CRGB leds[NUM_LEDS];
-CRGB leds[255];    // set this for the maximum suitable string, and will only be limited in runtime via user setting ( default 8)
+CRGB leds[255];  // set this for the maximum suitable string, and will only be limited in runtime via user setting ( default 8)
 
 // Battery Monitor
 
@@ -106,10 +106,10 @@ typedef enum {
 //blend_mode currentBlend = NO_BLEND;
 
 static char blendNames[][8] = {
-"None",
-"Direct",
-"Long",
-"Short"
+  "None",
+  "Direct",
+  "Long",
+  "Short"
 };
 
 
@@ -128,12 +128,18 @@ struct LED_data {  // Channel A
 LED_data defaultData = {
   100, 255, START_BRIGHTNESS,
   200, 255, START_BRIGHTNESS,
-  NO_BLEND, NUM_LEDS
+  DIRECT_BLEND, NUM_LEDS
 };
 
 LED_data currentLED = defaultData;
 
 
+// palette blending options
+CRGBPalette16 outputPalette;
+TBlendType currentBlending = LINEARBLEND_NOWRAP;
+
+CHSV colourA = CHSV(40, 255, 255);
+CHSV colourB = CHSV(128, 255, 255);
 // Channel A
 /*
 uint8_t ch_A_hue = 20;

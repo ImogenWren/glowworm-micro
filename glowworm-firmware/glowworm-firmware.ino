@@ -114,6 +114,21 @@ void loop() {
       }
     } else if (currentLED.blend == DIRECT_BLEND) {
       // use pallets?
+      //  for (int i = 0; i < currentLED.num_leds / 2; i++) {
+      //   outputPalette[0] = CHSV(currentLED.ch_A_hue, currentLED.ch_A_sat, currentLED.ch_A_bright);  // fill entire pallette with both colours
+      // }
+      // for (int i = currentLED.num_leds / 2; i < currentLED.num_leds; i++) {
+      //  outputPalette[1] = CHSV(currentLED.ch_B_hue, currentLED.ch_B_sat, currentLED.ch_B_bright);
+      //  }
+      colourA = CHSV(currentLED.ch_A_hue, currentLED.ch_A_sat, currentLED.ch_A_bright);
+      colourB = CHSV(currentLED.ch_B_hue, currentLED.ch_B_sat, currentLED.ch_B_bright);
+      buildPalette();
+
+      // trying to get a pallette using just the two colours
+      for (int i = 0; i < currentLED.num_leds; i++) {
+        uint8_t index = map(i, 0, NUM_LEDS - 1, 0, 255);
+        leds[i] = ColorFromPalette(outputPalette, index, currentLED.ch_A_bright , currentBlending);
+      }
     }
 
     FastLED.show();
