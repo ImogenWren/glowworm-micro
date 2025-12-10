@@ -58,45 +58,68 @@ void loop() {
   // Sample OLED Button
   button.buttonLoop(4000);
   // SBC power cycle trigger
-  if (button.shortPress || button.longPress) {
-    buttonPressed++;
-
+  if (button.shortPress) {
+    select_mode = !select_mode;
     button.buttonReset();
   }
-  // Power Control State Machines
-  // sbc_state_machine();
-  // exp_state_machine();
 
-  // Voltage/Current Data Collection & Reporting
-  // if (millis() - lastSample_mS >= 200) {
-  //   lastSample_mS = millis();
-  ////  sample_power();
-  //   samples_taken++;
-  // }
+  if (button.longPress) {
+    // do shutdown
+    button.buttonReset();
+  }
 
-
-  // if (samples_taken >= samples_required) {
-  //    //samplingComplete = true;  // this does nothing lol
-  ////    calculate_power();
-  //   print_serial_stats();
-  //   print_trigger_status();
-  //   Serial.println();
   update_oled();
-  //  samples_taken = 0;
-  // }
+
+
   if (ISR_triggered) {
-    currentLED.ch_A_hue = encoderVal;
-    currentLED.ch_B_hue = encoderVal+150;
-    for (int i = 0; i < currentLED.num_leds/2; ++i) {
-      leds[i] = CHSV(currentLED.ch_A_hue, currentLED.ch_A_sat, currentLED.ch_A_bright);
+    if (select_mode) {
+      active_stat = encoder_rollover(active_stat, direction, 0, 7);
+    } else {
+      // adjust the live value
+
+      if (active_stat == 0) {
+        currentLED.num_leds = encoder_rollover(currentLED.num_leds, direction, 0, 255);
+      } else if (active_stat == 1) {
+        currentLED.blend = encoder_rollover(currentLED.blend, direction, 0, WHEEL_LONG);
+      } else if (active_stat == 2) {
+        currentLED.ch_A_hue = encoder_rollover(currentLED.ch_A_hue, direction, 0, 255);
+      } else if (active_stat == 3) {
+        currentLED.ch_A_sat = encoder_rollover(currentLED.ch_A_sat, direction, 0, 255);
+      } else if (active_stat == 4) {
+        currentLED.ch_A_bright = encoder_rollover(currentLED.ch_A_bright, direction, 0, 255);
+      } else if (active_stat == 5) {
+        currentLED.ch_B_hue = encoder_rollover(currentLED.ch_B_hue, direction, 0, 255);
+      } else if (active_stat == 6) {
+        currentLED.ch_B_sat = encoder_rollover(currentLED.ch_B_sat, direction, 0, 255);
+      } else if (active_stat == 7) {
+        currentLED.ch_B_bright = encoder_rollover(currentLED.ch_B_bright, direction, 0, 255);
+      } else if (active_stat > 7) {
+        Serial.println(F("ERROR, illegal active stat"));
+      }
+
+      updateLEDs = true;
     }
-      for (int i = currentLED.num_leds/2; i < currentLED.num_leds; ++i) {
-      leds[i] = CHSV(currentLED.ch_B_hue, currentLED.ch_B_sat, currentLED.ch_B_bright);
+    ISR_triggered = false;
+  }
+
+  if (updateLEDs) {
+    // then update the LED outputs depending on blend mode
+    // if blend mode is NONE
+    if (currentLED.blend == NO_BLEND) {
+      for (int i = 0; i < currentLED.num_leds / 2; ++i) {
+        leds[i] = CHSV(currentLED.ch_A_hue, currentLED.ch_A_sat, currentLED.ch_A_bright);
+      }
+      for (int i = currentLED.num_leds / 2; i < currentLED.num_leds; ++i) {
+        leds[i] = CHSV(currentLED.ch_B_hue, currentLED.ch_B_sat, currentLED.ch_B_bright);
+      }
+    } else if (currentLED.blend == DIRECT_BLEND) {
+      // use pallets?
     }
 
     FastLED.show();
+
     // FastLED.delay(1000 / UPDATES_PER_SECOND);
-    ISR_triggered = false;
+    updateLEDs = false;
   }
 }
 

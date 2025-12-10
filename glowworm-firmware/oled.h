@@ -159,62 +159,136 @@ void old_stats_screen() {
 
 
 
-void power_stats_screen() {
+
+const char UI_text[][8] = {
+  "leds",
+  "blnd",
+  "Hue",
+  "Sat",
+  "Brt",
+  "Hue",
+  "Sat",
+  "Brt"
+};
+
+const uint8_t UI_text_X[8] = {
+  60,
+  60,
+  COL_0,
+  COL_0,
+  COL_0,
+  COL_2,
+  COL_2,
+  COL_2
+};
+
+const uint8_t UI_text_Y[8] = {
+  0,
+  8,
+  ROW_2,
+  ROW_3,
+  ROW_4,
+  ROW_2,
+  ROW_3,
+  ROW_4
+};
+
+
+void led_stats_screen() {
   display.setTextColor(WHITE);
+
+  char val_buffer[8][8];
+
+
+  itoa(currentLED.num_leds, val_buffer[0], 10);
+  strcpy(val_buffer[1], blendNames[currentLED.blend]);
+  itoa(currentLED.ch_A_hue, val_buffer[2], 10);
+  itoa(currentLED.ch_A_sat, val_buffer[3], 10);
+  itoa(currentLED.ch_A_bright, val_buffer[4], 10);
+  itoa(currentLED.ch_B_hue, val_buffer[5], 10);
+  itoa(currentLED.ch_B_sat, val_buffer[6], 10);
+  itoa(currentLED.ch_B_bright, val_buffer[7], 10);
+
+  //  Serial.println(val_buffer[0]);
+  // Serial.println(val_buffer[1]);
+
+
+
   char printBuffer[24];
-  // Global Settings
-  display.setCursor(60, 0);  //(x,y) (COL, ROW)
-  sprintf(printBuffer, "leds: %u", num_leds);
-  display.print(printBuffer);
 
-  display.setCursor(60, 8);  //(x,y) (COL, ROW)
-  sprintf(printBuffer, "blnd: %s", blendNames[currentBlend]);
-  display.print(printBuffer);
 
-  // do channel A first
-  display.drawRoundRect(0, 16, BOX_WIDTH, BOX_HEIGHT, BOX_RADIUS, WHITE);  // x, y, w, h, rad, colour
+  //  channel A Header & border
+  display.drawRoundRect(0, 16, BOX_WIDTH, BOX_HEIGHT, 3, WHITE);  // x, y, w, h, rad, colour
   display.setCursor(COL_0, ROW_1);
   display.print(F("CH:A "));
 
-  display.setCursor(COL_0, ROW_2);
-  sprintf(printBuffer, "Hue: %2u", currentLED.ch_A_hue);
-  display.print(printBuffer);
-
-  display.setCursor(COL_0, ROW_3);
-  sprintf(printBuffer, "Sat: %2u", currentLED.ch_A_sat);
-  display.print(printBuffer);
-
-
-  display.setCursor(COL_0, ROW_4);
-  sprintf(printBuffer, "Brt: %2u", currentLED.ch_A_bright);
-  display.print(printBuffer);
-
-
-  // do channel B first
-  display.drawRoundRect(126 - BOX_WIDTH, 16, BOX_WIDTH, BOX_HEIGHT, BOX_RADIUS, WHITE);  // x, y, w, h, rad, colour
+  // do channel B Header & border
+  display.drawRoundRect(126 - BOX_WIDTH, 16, BOX_WIDTH, BOX_HEIGHT, 3, WHITE);  // x, y, w, h, rad, colour
   display.setCursor(COL_2, ROW_1);
   display.print(F("CH:B "));
 
-  display.setCursor(COL_2, ROW_2);
+  // function to print all the UI text, highlighting the active one
+  // delay(5000);
+  for (int i = 0; i < 8; i++) {  // loop through all the arrays printing each value in the place specified
+    display.setCursor(UI_text_X[i], UI_text_Y[i]);
 
-  sprintf(printBuffer, "Hue: %2u", currentLED.ch_B_hue);
-  display.print(printBuffer);
+    if (i != active_stat) {
+      display.setTextColor(WHITE);
+      sprintf(printBuffer, "%s:%5s", UI_text[i], val_buffer[i]);
+      display.print(printBuffer);
+    } else {
 
-  display.setCursor(COL_2, ROW_3);
+      if (select_mode) {
+        if (i < 2) {  // the first 2 menu options are longer and need a longer box printed
+          display.fillRoundRect(UI_text_X[i] - 1, UI_text_Y[i] - 1, 32, 10, 2, WHITE);
+        } else {  // last 2 options are shorter and need shorter box
+          display.fillRoundRect(UI_text_X[i] - 1, UI_text_Y[i] - 1, 28, 10, 2, WHITE);
+        }
+        display.setTextColor(BLACK);              // print half the text in black
+        sprintf(printBuffer, "%s:", UI_text[i]);  //  ;, val_buffer[i]);%5s"
+        display.print(printBuffer);
+        display.setTextColor(WHITE);                 // print half the text in white
+        sprintf(printBuffer, "%5s", val_buffer[i]);  //  ;, );%5s"
+        display.print(printBuffer);
 
-  sprintf(printBuffer, "Sat: %2u", currentLED.ch_B_sat);
-  display.print(printBuffer);
+      } else {        // else we are not in select mode, the whole item should be highlighted
+        if (i < 2) {  // the first 2 menu options are longer and need a longer box printed
+          display.fillRoundRect(UI_text_X[i] - 1, UI_text_Y[i] - 1, 64, 10, 2, WHITE);
+        } else {  // last 2 options are shorter and need shorter box
+          display.fillRoundRect(UI_text_X[i] - 1, UI_text_Y[i] - 1, 56, 10, 2, WHITE);
+        }
+        display.setTextColor(BLACK);  // print all text in black
+        sprintf(printBuffer, "%s:%5s", UI_text[i], val_buffer[i]);
+        display.print(printBuffer);
+      }
+    }
+  }
+}
 
 
-  display.setCursor(COL_2, ROW_4);
-  sprintf(printBuffer, "Brt: %2u", currentLED.ch_B_bright);
-  display.print(printBuffer);
 
+//void fillRoundRect(int16_t x0, int16_t y0, int16_t w, int16_t h,
+//                    int16_t radius, uint16_t color);
 
-
-  display.print(buttonPressed);
-
-  display.setCursor(COL_3, ROW_2);
+void battery_indicator(uint8_t batteryLevel = 4) {
+  display.setTextColor(WHITE);
+  display.setCursor(1, 9);  // x, y
+  display.print(F("Batt:"));
+  // Always draw outline
+  display.drawRoundRect(32, 10, 16, 6, 1, WHITE);  // x, y, w, h, rad, colour
+  display.drawRoundRect(47, 11, 3, 4, 1, WHITE);
+  if (batteryLevel > 0) {
+    display.fillRoundRect(32, 10, 4, 6, 1, WHITE);  // x, y, w, h, rad, colour
+  }
+  if (batteryLevel > 1) {
+    display.fillRoundRect(37, 10, 4, 6, 1, WHITE);  // x, y, w, h, rad, colour
+  }
+  if (batteryLevel > 2) {
+    display.fillRoundRect(42, 10, 4, 6, 1, WHITE);  // x, y, w, h, rad, colour
+  }
+  if (batteryLevel > 3) {
+    display.fillRoundRect(47, 11, 3, 4, 1, WHITE);  // x, y, w, h, rad, colour
+  }
 }
 
 void update_oled() {  // char *Vexp, char *Iexp, char *Vsbc, char *Isbc, char *sbcTrig, char *extTrig, char *expTrig, char *sbcReboot, char *expReboot) {
@@ -231,11 +305,11 @@ void update_oled() {  // char *Vexp, char *Iexp, char *Vsbc, char *Isbc, char *s
                             //  display.setTextColor(WHITE);
                             // char printBuffer[24];
   //sprintf(printBuffer, "          Blend: %s", blendNames[currentBlend]);
- // display.print(printBuffer);
+  // display.print(printBuffer);
 
   // display.setTextSize(1.9);  // Draw 2X-scale text
-
-  power_stats_screen();
+  battery_indicator(battery_indicator_level);
+  led_stats_screen();
 
 
   display.display();

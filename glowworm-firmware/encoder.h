@@ -1,6 +1,19 @@
 
 
 
+
+int16_t encoder_rollover(int currentVal, int direction = 1, int minVal = 0, int maxVal = 8) {
+  int newVal = currentVal + direction;
+  if (newVal > maxVal) {
+    newVal = minVal;
+  } else if (newVal < minVal) {
+    newVal = maxVal;
+  }
+  return newVal;
+}
+
+
+
 void ISR_encoder() {
   if ((millis() - last_time) < 1) {  // debounce time is 50ms
     return;
@@ -10,8 +23,10 @@ void ISR_encoder() {
   // encoderVal += (clock != data) ? +1 : -1;
   if (clock != data) {
     encoderVal++;
+    direction = DIRECTION_CW;
   } else {
     encoderVal--;
+    direction = DIRECTION_CCW;
   }
 
   ISR_triggered = true;

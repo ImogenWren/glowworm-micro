@@ -1,7 +1,7 @@
 
 
-#ifndef GLOBALS_H
-#define GLOBALS_H
+#ifndef globals_h
+#define globals_h
 
 
 
@@ -27,7 +27,7 @@
 
 
 // Configuration
-#define SHOW_SPASH_SCREEN true
+#define SHOW_SPASH_SCREEN false
 
 // I2C
 #define SDA_PIN A4
@@ -37,8 +37,8 @@
 #define ENCODER_CLK 2
 #define ENCODER_DAT 3
 
-#define DIRECTION_CW 0   // clockwise direction
-#define DIRECTION_CCW 1  // counter-clockwise direction
+#define DIRECTION_CW 1   // clockwise direction
+#define DIRECTION_CCW -1  // counter-clockwise direction
 
 #define ENCODER_PPR 600
 #define ENCODER_TYPE TWO_WIRE
@@ -55,7 +55,9 @@
 #define LED_TYPE WS2811
 #define COLOR_ORDER GRB
 #define UPDATES_PER_SECOND 100
-CRGB leds[NUM_LEDS];
+
+//CRGB leds[NUM_LEDS];
+CRGB leds[255];    // set this for the maximum suitable string, and will only be limited in runtime via user setting ( default 8)
 
 // Battery Monitor
 
@@ -86,8 +88,10 @@ volatile bool ISR_triggered = false;
 //const char SYSTEM_NAME = {"Practable Power Hat V1.0"}
 const uint8_t I2C_ADDRESS = 0x08;  // Address of i2c slave (self)
 
-
-
+uint8_t active_stat = 0;  // The active high bit highlights the selected sat in the UI
+bool select_mode = true;  // when select mode is active, encoder used to select active stat. When false,
+// encoder changes value of active stat
+bool updateLEDs = true;
 
 // LED data struc -> set up like this to make saving and recalling data from memory easy
 
@@ -99,7 +103,7 @@ typedef enum {
   WHEEL_LONG
 } blend_mode;
 
-blend_mode currentBlend = NO_BLEND;
+//blend_mode currentBlend = NO_BLEND;
 
 static char blendNames[][8] = {
 "None",
@@ -122,8 +126,8 @@ struct LED_data {  // Channel A
 };
 
 LED_data defaultData = {
-  20, 255, START_BRIGHTNESS,
-  230, 255, START_BRIGHTNESS,
+  100, 255, START_BRIGHTNESS,
+  200, 255, START_BRIGHTNESS,
   NO_BLEND, NUM_LEDS
 };
 
@@ -131,6 +135,7 @@ LED_data currentLED = defaultData;
 
 
 // Channel A
+/*
 uint8_t ch_A_hue = 20;
 uint8_t ch_A_sat = 255;
 uint8_t ch_A_bright = START_BRIGHTNESS;
@@ -139,10 +144,13 @@ uint8_t ch_A_bright = START_BRIGHTNESS;
 uint8_t ch_B_hue = 230;
 uint8_t ch_B_sat = 255;
 uint8_t ch_B_bright = START_BRIGHTNESS;
+*/
 
 // All Channels
 //uint8_t blend = 0;
-uint8_t num_leds = 6;
+//uint8_t num_leds = 6;
+
+uint8_t battery_indicator_level = 2;  // while charging this can cylce from 1 to 3
 
 // Internal Headers
 #include "encoder.h"
