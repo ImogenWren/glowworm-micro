@@ -27,7 +27,8 @@ void setup() {
 
   pinMode(ENCODER_CLK, INPUT);
   pinMode(ENCODER_DAT, INPUT);
-
+  indicator.begin(150);
+  indicator.callBlink(10, 40, 130 ); 
 
   // Setup IO Pins
   delay(1000);
@@ -65,6 +66,7 @@ void loop() {
 
   if (button.longPress) {
     // do shutdown
+    indicator.callBlink(10, 40, 130 ); 
     button.buttonReset();
   }
 
@@ -78,7 +80,8 @@ void loop() {
       // adjust the live value
 
       if (active_stat == 0) {
-        currentLED.num_leds = encoder_rollover(currentLED.num_leds, direction, 0, 255);
+        currentLED.num_leds = encoder_rollover(currentLED.num_leds, direction, 0, MAX_LED_LENGTH);
+        num_leds_updated = true;
       } else if (active_stat == 1) {
         currentLED.blend = encoder_rollover(currentLED.blend, direction, 0, WHEEL_LONG);
       } else if (active_stat == 2) {
@@ -100,6 +103,13 @@ void loop() {
       updateLEDs = true;
     }
     ISR_triggered = false;
+  }
+
+  if (num_leds_updated) {
+    for (int i = currentLED.num_leds; i < MAX_LED_LENGTH; i++) {
+      leds[i] = CHSV(0, 0, 0);  // turn all the remaining LEDs back, rather than just have them not update
+    }
+    num_leds_updated = false;
   }
 
   if (updateLEDs) {
@@ -126,16 +136,31 @@ void loop() {
 
       // trying to get a pallette using just the two colours
       for (int i = 0; i < currentLED.num_leds; i++) {
-        uint8_t index = map(i, 0, NUM_LEDS - 1, 0, 255);
-        leds[i] = ColorFromPalette(outputPalette, index, currentLED.ch_A_bright , currentBlending);
+        uint8_t index = map(i, 0, currentLED.num_leds - 1, 0, 255);
+        leds[i] = ColorFromPalette(outputPalette, index, currentLED.ch_A_bright, LINEARBLEND_NOWRAP);
       }
+    } else if (currentLED.blend == WHEEL_SHORT) {
+      colourA = CHSV(currentLED.ch_A_hue, currentLED.ch_A_sat, currentLED.ch_A_bright);
+      colourB = CHSV(currentLED.ch_B_hue, currentLED.ch_B_sat, currentLED.ch_B_bright);
+      fill_gradient(leds, currentLED.num_leds - 1, colourA, colourB, SHORTEST_HUES);
+      //leds[currentLED.num_leds - 1] = CHSV(currentLED.ch_B_hue, currentLED.ch_B_sat, currentLED.ch_B_bright);  // this line makes sure our maths works, the penultamate LED should blend into the last one that is set to the channel B colour
+    } else if (currentLED.blend == WHEEL_LONG) {
+      colourA = CHSV(currentLED.ch_A_hue, currentLED.ch_A_sat, currentLED.ch_A_bright);
+      colourB = CHSV(currentLED.ch_B_hue, currentLED.ch_B_sat, currentLED.ch_B_bright);
+      fill_gradient(leds, currentLED.num_leds - 1, colourA, colourB, LONGEST_HUES);
+      // leds[currentLED.num_leds - 1] = CHSV(currentLED.ch_B_hue, currentLED.ch_B_sat, currentLED.ch_B_bright);  // this line makes sure our maths works, the penultamate LED should blend into the last one that is set to the channel B colour
     }
 
     FastLED.show();
-
-    // FastLED.delay(1000 / UPDATES_PER_SECOND);
-    updateLEDs = false;
+    //  // FastLED.delay(1000 / UPDATES_PER_SECOND);
+    //  multi_update++;
+    //  if (multi_update > 2){
+    //     multi_update = 0;
+    updateLEDs = false;  // this is here to try and prevent LEDs getting out of sync because of a bad interrupt
+    //  }
+    // updateLEDs = false;
   }
+  indicator.performBlink();
 }
 
 

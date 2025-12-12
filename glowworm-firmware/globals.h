@@ -12,6 +12,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <FastLED.h>
+#include <ledObject.h>
 
 
 
@@ -55,9 +56,10 @@
 #define LED_TYPE WS2811
 #define COLOR_ORDER GRB
 #define UPDATES_PER_SECOND 100
+#define MAX_LED_LENGTH 255
 
 //CRGB leds[NUM_LEDS];
-CRGB leds[255];  // set this for the maximum suitable string, and will only be limited in runtime via user setting ( default 8)
+CRGB leds[MAX_LED_LENGTH];  // set this for the maximum suitable string, and will only be limited in runtime via user setting ( default 8)
 
 // Battery Monitor
 
@@ -76,6 +78,7 @@ CRGB leds[255];  // set this for the maximum suitable string, and will only be l
 
 // Global Objects
 buttonObject button(ENCODER_BUTTON_EXTINT7, BUTTON_PULL_HIGH);
+ledObject indicator(LED_BUILTIN);
 
 
 volatile uint8_t encoderVal = 0;
@@ -92,6 +95,8 @@ uint8_t active_stat = 0;  // The active high bit highlights the selected sat in 
 bool select_mode = true;  // when select mode is active, encoder used to select active stat. When false,
 // encoder changes value of active stat
 bool updateLEDs = true;
+uint8_t multi_update = 0;
+bool num_leds_updated = true;
 
 // LED data struc -> set up like this to make saving and recalling data from memory easy
 
@@ -108,8 +113,8 @@ typedef enum {
 static char blendNames[][8] = {
   "None",
   "Direct",
-  "Long",
-  "Short"
+  "Short",
+  "Long"
 };
 
 
