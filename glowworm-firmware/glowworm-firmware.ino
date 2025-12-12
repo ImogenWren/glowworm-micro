@@ -21,6 +21,7 @@ Example functions for printing bitmap images to SSD1306 OLED screen
 void setup() {
   // Setup Serial
   Serial.begin(115200);
+  digitalWrite(MOSFET_CTRL, true);
   delay(3000);
   Serial.println(F("\nGlowWorm Micro"));
   Serial.println(F("lighting controller"));
@@ -28,7 +29,7 @@ void setup() {
   pinMode(ENCODER_CLK, INPUT);
   pinMode(ENCODER_DAT, INPUT);
   indicator.begin(150);
-  indicator.callBlink(10, 40, 130 ); 
+  indicator.callBlink(10, 40, 130);
 
   // Setup IO Pins
   delay(1000);
@@ -40,6 +41,9 @@ void setup() {
   // use interrupt for CLK pin is enough
   // call ISR_encoder() when CLK pin changes from LOW to HIGH
   attachInterrupt(digitalPinToInterrupt(ENCODER_CLK), ISR_encoder, RISING);
+  // Wake on rising edge (HIGH)
+  LowPower.attachInterruptWakeup(ENCODER_BUTTON_EXTINT8, onWakeupISR, RISING);
+
 
 
   // set up LED string
@@ -57,7 +61,7 @@ void setup() {
 void loop() {
 
   // Sample OLED Button
-  button.buttonLoop(4000);
+  button.buttonLoop(WAKE_UP_TIME);
   // SBC power cycle trigger
   if (button.shortPress) {
     select_mode = !select_mode;
@@ -66,9 +70,13 @@ void loop() {
 
   if (button.longPress) {
     // do shutdown
-    indicator.callBlink(10, 40, 130 ); 
+    indicator.callBlink(10, 40, 130);
+    onShutdown();
     button.buttonReset();
   }
+  check_wake_button();
+  unblock_sleep();
+
 
   update_oled();
 

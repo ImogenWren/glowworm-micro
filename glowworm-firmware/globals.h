@@ -13,7 +13,7 @@
 #include <Adafruit_SSD1306.h>
 #include <FastLED.h>
 #include <ledObject.h>
-
+#include <buttonObject.h>
 
 
 
@@ -24,19 +24,25 @@
 
 #include <avr/dtostrf.h>  //needed for SAMD21 only
 
-#include <buttonObject.h>
-
 
 // Configuration
 #define SHOW_SPASH_SCREEN false
 
+// IO PINS
 // I2C
 #define SDA_PIN A4
 #define SCL_PIN A5
-
 // Encoder
 #define ENCODER_CLK 2
-#define ENCODER_DAT 3
+#define ENCODER_DAT 4
+// smart LEDS
+#define LED_DATA_PIN 6
+// sleep function vars
+#define ENCODER_BUTTON_EXTINT8 3
+#define MOSFET_CTRL 7
+
+// Battery Monitor
+#define BATTERY_SENSE_PIN A0
 
 #define DIRECTION_CW 1    // clockwise direction
 #define DIRECTION_CCW -1  // counter-clockwise direction
@@ -46,10 +52,10 @@
 #define ENCODER_NAME "encoder"
 
 // Button
-#define ENCODER_BUTTON_EXTINT7 4
+
 
 // LED
-#define LED_DATA_PIN 6
+
 
 #define NUM_LEDS 6
 #define START_BRIGHTNESS 200
@@ -61,9 +67,21 @@
 //CRGB leds[NUM_LEDS];
 CRGB leds[MAX_LED_LENGTH];  // set this for the maximum suitable string, and will only be limited in runtime via user setting ( default 8)
 
-// Battery Monitor
 
-#define BATTERY_SENSE_PIN A0
+
+
+
+//ledObject indicator(LED_BUILTIN);
+
+
+#include <ArduinoLowPower.h>
+#define WAKE_UP_TIME 2500
+
+volatile bool wokeFromInterrupt = false;
+volatile bool sleep_active = false;
+
+bool sleep_block = false;
+unsigned long wake_start;
 
 
 
@@ -77,9 +95,10 @@ CRGB leds[MAX_LED_LENGTH];  // set this for the maximum suitable string, and wil
 
 
 // Global Objects
-buttonObject button(ENCODER_BUTTON_EXTINT7, BUTTON_PULL_HIGH);
+buttonObject button(ENCODER_BUTTON_EXTINT8, BUTTON_PULL_HIGH);
 ledObject indicator(LED_BUILTIN);
 
+#include "sleepFunctions.h"
 
 volatile uint8_t encoderVal = 0;
 uint8_t buttonPressed = 0;

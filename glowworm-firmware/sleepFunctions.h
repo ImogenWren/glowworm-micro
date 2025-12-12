@@ -36,10 +36,10 @@ void onShutdown() {  // everything that needs to happen when the system powers d
     wokeFromInterrupt = false;
     USBDevice.detach();
     sleep_active = true;
+   
 
     LowPower.sleep();  // MCU sleeps her
-  }
-  button.buttonReset();
+  } 
 }
 
 void check_wake_button() {
@@ -62,5 +62,15 @@ void check_wake_button() {
     // if function hasnt hit return, then go back to sleep
     USBDevice.detach();
     LowPower.sleep();
+  }
+}
+
+void unblock_sleep(){
+    // reset the sleep blocker after a few seconds
+  if (sleep_block) {
+    if (millis() - wake_start >= 7000) {
+      Serial.println("ending sleep block");
+      sleep_block = false;
+    }
   }
 }
