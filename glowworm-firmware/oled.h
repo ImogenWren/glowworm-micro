@@ -278,13 +278,13 @@ void battery_indicator(uint8_t batteryLevel = 4) {
   display.drawRoundRect(32, 10, 16, 6, 1, WHITE);  // x, y, w, h, rad, colour
   display.drawRoundRect(47, 11, 3, 4, 1, WHITE);
   if (batteryLevel > 0) {
-    display.fillRoundRect(32, 10, 4, 6, 1, WHITE);  // x, y, w, h, rad, colour
+    display.fillRoundRect(32, 10, 5, 6, 1, WHITE);  // x, y, w, h, rad, colour
   }
   if (batteryLevel > 1) {
-    display.fillRoundRect(37, 10, 4, 6, 1, WHITE);  // x, y, w, h, rad, colour
+    display.fillRoundRect(37, 10, 5, 6, 1, WHITE);  // x, y, w, h, rad, colour
   }
   if (batteryLevel > 2) {
-    display.fillRoundRect(42, 10, 4, 6, 1, WHITE);  // x, y, w, h, rad, colour
+    display.fillRoundRect(41, 10, 5, 6, 1, WHITE);  // x, y, w, h, rad, colour
   }
   if (batteryLevel > 3) {
     display.fillRoundRect(47, 11, 3, 4, 1, WHITE);  // x, y, w, h, rad, colour

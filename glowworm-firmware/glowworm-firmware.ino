@@ -59,6 +59,8 @@ void setup() {
 
 
 void loop() {
+  // sample battery voltage
+  batteryMonitor();
 
   // Sample OLED Button
   button.buttonLoop(WAKE_UP_TIME);

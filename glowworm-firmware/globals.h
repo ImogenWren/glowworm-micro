@@ -14,7 +14,8 @@
 #include <FastLED.h>
 #include <ledObject.h>
 #include <buttonObject.h>
-
+//#include <multiMeter.h>
+#include "calibration.h"
 
 
 
@@ -43,6 +44,9 @@
 
 // Battery Monitor
 #define BATTERY_SENSE_PIN A0
+//#define INPUT_V_MAX 3.3      // Max Voltage for the ADC Input Pin
+//#define ADC_RESOLUTION 10  // Typically 10bit on Arduino Platforms
+//#define DO_TABLE_CAL false
 
 #define DIRECTION_CW 1    // clockwise direction
 #define DIRECTION_CCW -1  // counter-clockwise direction
@@ -97,6 +101,8 @@ unsigned long wake_start;
 // Global Objects
 buttonObject button(ENCODER_BUTTON_EXTINT8, BUTTON_PULL_HIGH);
 ledObject indicator(LED_BUILTIN);
+//multiMeter voltMeter(BATTERY_SENSE_PIN, METER_TYPE, INPUT_V_MAX, ADC_RESOLUTION, DO_TABLE_CAL);
+calibration cal;
 
 #include "sleepFunctions.h"
 
@@ -180,10 +186,16 @@ uint8_t ch_B_bright = START_BRIGHTNESS;
 //uint8_t blend = 0;
 //uint8_t num_leds = 6;
 
-uint8_t battery_indicator_level = 2;  // while charging this can cylce from 1 to 3
+#define BATTERY_SAMPLES_REQ 20
+uint8_t battery_indicator_level = 0;  // while charging this can cylce from 1 to 3
+uint8_t batt_indicator_unsmoothed[BATTERY_SAMPLES_REQ + 2];
+uint8_t battery_samples_taken = 0;
+int16_t battery_adc = 0;
+float batteryVoltage;
 
 // Internal Headers
 #include "encoder.h"
+#include "batteryMonitor.h"
 #include "oled.h"
 #include "leds.h"
 #include "state_machines.h"
