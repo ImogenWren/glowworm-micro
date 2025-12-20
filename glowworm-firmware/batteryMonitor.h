@@ -5,7 +5,7 @@ calibration::cal_data cal_map[8] = {
   { 2.39, 3.672 },
   { 2.50, 3.797 },
   { 2.70, 3.978 },
-  { 2.89, 4.177 },
+  { 2.89, 4.150 },
   { 3.04, 4.324 }
 };
 
@@ -17,7 +17,7 @@ void batteryMonitor() {
 
 
   battery_adc = analogRead(BATTERY_SENSE_PIN);
-  float measured_voltage = battery_adc * 3.15E-3;  //current value found via measurement  //22265625
+  float measured_voltage = battery_adc * 3.1E-3;  //current value found via measurement  //22265625
   Serial.print("adc: ");
   Serial.print(battery_adc);
   Serial.print("  measuredV: ");
@@ -25,9 +25,10 @@ void batteryMonitor() {
   batteryVoltage = cal.do_table_calibration(measured_voltage, cal_map);
   if (batteryVoltage <= 3.35) temp_batt_level = 0;
   else if (batteryVoltage > 3.37 && batteryVoltage <= 3.75) temp_batt_level = 1;
-  else if (batteryVoltage > 3.75 && batteryVoltage <= 4.0) temp_batt_level = 2;
-  else if (batteryVoltage > 4.0 && batteryVoltage <= 4.1) temp_batt_level = 3;
-  else if (batteryVoltage > 4.1) temp_batt_level = 4;
+  else if (batteryVoltage > 3.75 && batteryVoltage <= 4.1) temp_batt_level = 2;
+  else if (batteryVoltage > 4.1 && batteryVoltage <= 4.15) temp_batt_level = 3;
+  else if (batteryVoltage > 4.15) temp_batt_level = 4;
+
 
 
   if (battery_samples_taken < BATTERY_SAMPLES_REQ) {
