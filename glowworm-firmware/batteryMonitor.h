@@ -1,33 +1,51 @@
-calibration::cal_data cal_map[8] = {
+calibration::cal_data cal_map[10] = {
   { 1.68, 2.965 },
   { 1.87, 3.161 },
   { 2.08, 3.358 },
   { 2.39, 3.672 },
-  { 2.50, 3.797 },
+  { 2.47, 3.819 },
   { 2.70, 3.978 },
-  { 2.89, 4.150 },
+  { 2.885, 4.000 },
+  { 2.90, 4.022 },
+  { 2.92, 4.056 },
   { 3.04, 4.324 }
 };
 
 // Battery level goes from 0 to above 3
 // now with averaging to stop the animation jumping up and down all the time
+#define NUM_SAMPLES 100
+
+int sampleIndex = 0;
+int sampleVal = 0;
+int sampleSum = 0;
+int sampleRead[NUM_SAMPLES];
+float averaged = 0;
+
 
 void batteryMonitor() {
   uint8_t temp_batt_level = 0;
 
 
-  battery_adc = analogRead(BATTERY_SENSE_PIN);
+  sampleSum = sampleSum - sampleRead[sampleIndex];  // remove the oldest sample from the sum
+  sampleVal = analogRead(BATTERY_SENSE_PIN);
+  sampleRead[sampleIndex] = sampleVal;
+  sampleSum = sampleSum + sampleVal;
+  sampleIndex = (sampleIndex + 1) % NUM_SAMPLES;
+
+  averaged = float(sampleSum) / float(NUM_SAMPLES);
+
+  float battery_adc = averaged;
   float measured_voltage = battery_adc * 3.1E-3;  //current value found via measurement  //22265625
   Serial.print("adc: ");
-  Serial.print(battery_adc);
+  Serial.print(averaged);
   Serial.print("  measuredV: ");
   Serial.print(measured_voltage);
   batteryVoltage = cal.do_table_calibration(measured_voltage, cal_map);
   if (batteryVoltage <= 3.35) temp_batt_level = 0;
   else if (batteryVoltage > 3.37 && batteryVoltage <= 3.75) temp_batt_level = 1;
-  else if (batteryVoltage > 3.75 && batteryVoltage <= 4.1) temp_batt_level = 2;
-  else if (batteryVoltage > 4.1 && batteryVoltage <= 4.15) temp_batt_level = 3;
-  else if (batteryVoltage > 4.15) temp_batt_level = 4;
+  else if (batteryVoltage > 3.75 && batteryVoltage <= 4.0) temp_batt_level = 2;
+  else if (batteryVoltage > 4.0 && batteryVoltage <= 4.14) temp_batt_level = 3;
+  else if (batteryVoltage > 4.14) temp_batt_level = 4;
 
 
 
