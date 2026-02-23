@@ -50,8 +50,8 @@ calibration::cal_data cal_map[MAX_ENTRIES] = {
 // Previous implmentation was done with std::map, howver as this is not available across all arduino implementions, this version will attempt to do the same with simple arrays
 // I think the best option is to use an 1-dimensional array of 2 dimensional arrays or data structures.
 
-#define MAX_ENTRIES 8  // Max entries in calibration table (limited only by memory)
-#define EPSILON 0.1     // Define the tolerance of float comparasons for "exact match"
+#define MAX_ENTRIES 10  // Max entries in calibration table (limited only by memory)
+#define EPSILON 0.001     // Define the tolerance of float comparasons for "exact match"
 
 //#define DEBUG_LEVEL WARNING
 
