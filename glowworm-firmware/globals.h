@@ -1,4 +1,4 @@
-
+#pragma once
 
 #ifndef globals_h
 #define globals_h
@@ -17,17 +17,25 @@
 //#include <multiMeter.h>
 #include "calibration.h"
 
+#include <ledObject.h>
+#include <buttonObject.h>
+
+const int BUTTON_PIN = 23;
+const int MOSFET_PIN = 32;
+
+const int GREEN_LED_PIN = 5;
+const int RED_LED_PIN = 19;
 
 
 //#include <Fonts/FreeMonoBold12pt7b.h >
 //#include <Fonts/FreeSansBold12pt7b.h >
 //#include <Fonts/FreeSansBold9pt7b.h >
 
-#include <avr/dtostrf.h>  //needed for SAMD21 only
+//#include <avr/dtostrf.h>  //needed for SAMD21 only
 
 
 // Configuration
-#define SHOW_SPASH_SCREEN false
+#define SHOW_SPASH_SCREEN true
 
 // IO PINS
 // I2C
@@ -37,7 +45,7 @@
 #define ENCODER_CLK 2
 #define ENCODER_DAT 4
 // smart LEDS
-#define LED_DATA_PIN 6
+#define LED_DATA_PIN 14//6
 // sleep function vars
 #define ENCODER_BUTTON_EXTINT8 3
 #define MOSFET_CTRL 7
@@ -78,7 +86,7 @@ CRGB leds[MAX_LED_LENGTH];  // set this for the maximum suitable string, and wil
 //ledObject indicator(LED_BUILTIN);
 
 
-#include <ArduinoLowPower.h>
+//#include <ArduinoLowPower.h>
 #define WAKE_UP_TIME 2500
 
 volatile bool wokeFromInterrupt = false;
@@ -103,6 +111,17 @@ buttonObject button(ENCODER_BUTTON_EXTINT8, BUTTON_PULL_HIGH);
 ledObject indicator(LED_BUILTIN);
 //multiMeter voltMeter(BATTERY_SENSE_PIN, METER_TYPE, INPUT_V_MAX, ADC_RESOLUTION, DO_TABLE_CAL);
 calibration cal;
+
+// OLED
+#define SCREEN_WIDTH 128  // OLED display width, in pixels
+#define SCREEN_HEIGHT 64  // OLED display height, in pixels
+
+#define OLED_ADDR 0x3C
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, -1);
+
+#if (SSD1306_LCDHEIGHT != 64)
+//#error("Height incorrect, please fix Adafruit_SSD1306.h!");
+#endif
 
 #include "sleepFunctions.h"
 

@@ -31,21 +31,22 @@ void onShutdown() {  // everything that needs to happen when the system powers d
                       // Sleep
   if (!sleep_block) {
     digitalWrite(MOSFET_CTRL, false);
+     digitalWrite(MOSFET_PIN, LOW);
     Serial.println(F("going to sleep"));
     // turn off any MOSFETS powering external devices
     wokeFromInterrupt = false;
-    USBDevice.detach();
+  //  USBDevice.detach();
     sleep_active = true;
    
 
-    LowPower.sleep();  // MCU sleeps her
+   // LowPower.sleep();  // MCU sleeps her
   } 
 }
 
 void check_wake_button() {
   // ---- Resume here after ANY wake event ----
   if (wokeFromInterrupt) {
-    USBDevice.attach();
+   // USBDevice.attach();
     delay(50);
     Serial.println("Woke from pin interrupt, checking long-press...");
 
@@ -60,8 +61,8 @@ void check_wake_button() {
       }
     }
     // if function hasnt hit return, then go back to sleep
-    USBDevice.detach();
-    LowPower.sleep();
+  //  USBDevice.detach();
+  //  LowPower.sleep();
   }
 }
 

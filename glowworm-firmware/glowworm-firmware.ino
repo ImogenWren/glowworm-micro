@@ -17,22 +17,48 @@ Example functions for printing bitmap images to SSD1306 OLED screen
 
 
 
+ledObject ledGRN(GREEN_LED_PIN);
+ledObject ledRED(RED_LED_PIN);
+buttonObject button2(BUTTON_PIN, BUTTON_PULL_HIGH);
+
 
 void setup() {
   // Setup Serial
   Serial.begin(115200);
-  digitalWrite(MOSFET_CTRL, true);
-  delay(3000);
   Serial.println(F("\nGlowWorm Micro"));
   Serial.println(F("lighting controller"));
+  Serial.println(F("Waking Up..."));
+  //digitalWrite(MOSFET_CTRL, true);
+  // delay(3000);
 
+  // set up IO
+  pinMode(BUTTON_PIN, INPUT);
+  pinMode(MOSFET_PIN, OUTPUT);
+  ledGRN.begin(false);
+  ledRED.begin(false);
   pinMode(ENCODER_CLK, INPUT);
   pinMode(ENCODER_DAT, INPUT);
+
+  // Check whether button is being held
+  uint32_t power_on_time_ms = millis();
+  bool still_asleep = true;
+  while (still_asleep) {
+
+    if (millis() - power_on_time_ms >= 2000) {
+      still_asleep = false;
+      Serial.println("Turning On");
+      digitalWrite(MOSFET_PIN, HIGH);
+      ledGRN.turnOn();
+    }
+  }
+  button2.begin();
+  ledRED.startBlink(1000, 1000);
+
   indicator.begin(150);
   indicator.callBlink(10, 40, 130);
 
   // Setup IO Pins
-  delay(1000);
+  // delay(1000);
   show_splash();
   // Set up button Object
   button.begin();
@@ -42,7 +68,7 @@ void setup() {
   // call ISR_encoder() when CLK pin changes from LOW to HIGH
   attachInterrupt(digitalPinToInterrupt(ENCODER_CLK), ISR_encoder, RISING);
   // Wake on rising edge (HIGH)
-  LowPower.attachInterruptWakeup(ENCODER_BUTTON_EXTINT8, onWakeupISR, RISING);
+  // LowPower.attachInterruptWakeup(ENCODER_BUTTON_EXTINT8, onWakeupISR, RISING);
 
 
 
@@ -70,14 +96,14 @@ void loop() {
     button.buttonReset();
   }
 
-  if (button.longPress) {
-    // do shutdown
-    indicator.callBlink(10, 40, 130);
-    onShutdown();
-    button.buttonReset();
-  }
-  check_wake_button();
-  unblock_sleep();
+  // if (button.longPress) {
+  // do shutdown
+  //    indicator.callBlink(10, 40, 130);
+  //   onShutdown();
+  //   button.buttonReset();
+  // }
+  // check_wake_button();
+  // unblock_sleep();
 
 
   update_oled();
@@ -170,6 +196,22 @@ void loop() {
     //  }
     // updateLEDs = false;
   }
+  if (button2.longPress) {
+    display.clearDisplay();
+    display.setCursor(25, 30);
+    display.print("Powering Off...");
+    display.display();
+    Serial.println("turning off...");
+    ledGRN.turnOff();
+    while (digitalRead(BUTTON_PIN)) {
+      //wait for system to shutdown
+    }
+    delay(1300);
+    digitalWrite(MOSFET_PIN, LOW);
+    button.buttonReset();  // this probably doesnt matter in this topology
+  }
+  ledRED.performBlink();
+  button2.buttonLoop(1500);
   indicator.performBlink();
 }
 
